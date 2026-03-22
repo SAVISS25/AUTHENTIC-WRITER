@@ -30,16 +30,6 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
-  // Auto-start the conversation with a greeting
-  useEffect(() => {
-    if (!hasStartedRef.current && messages.length === 0) {
-      hasStartedRef.current = true;
-      sendToAPI([]);
-    }
-  // sendToAPI is stable (useCallback with no deps), safe to omit
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const sendToAPI = useCallback(async (messageHistory: Message[], overrideMessages?: Message[]) => {
     const msgs = overrideMessages ?? messageHistory;
     setIsLoading(true);
@@ -83,6 +73,14 @@ export default function ChatInterface() {
       setIsLoading(false);
     }
   }, []);
+
+  // Auto-start the conversation with a greeting (sendToAPI is stable)
+  useEffect(() => {
+    if (!hasStartedRef.current && messages.length === 0) {
+      hasStartedRef.current = true;
+      sendToAPI([]);
+    }
+  }, [sendToAPI]);
 
   const handleSend = async () => {
     const trimmed = input.trim();
